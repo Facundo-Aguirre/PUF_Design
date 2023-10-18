@@ -36,7 +36,7 @@
  */
 
 module user_proj_example #(
-    parameter BITS = 16
+    parameter BITS = 32
 )(
 `ifdef USE_POWER_PINS
     inout vccd1,	// User area 1 1.8V supply
@@ -73,11 +73,9 @@ module user_proj_example #(
 
     wire [BITS-1:0] rdata; 
     wire [BITS-1:0] wdata;
-    wire [BITS-1:0] count;
 
     wire valid;
     wire [3:0] wstrb;
-    wire [BITS-1:0] la_write;
 
     // WB MI A
     assign valid = wbs_cyc_i && wbs_stb_i; 
@@ -86,51 +84,50 @@ module user_proj_example #(
     assign wdata = wbs_dat_i[BITS-1:0];
 
     // IO
-    assign io_out = count;
-    assign io_oeb = {(BITS){rst}};
+    assign io_oeb[37:6] = {(32){1'b1}};
+    assign io_oeb[5] = 1'b0;
 
     // IRQ
     assign irq = 3'b000;	// Unused
 
     // LA
-    assign la_data_out = {{(128-BITS){1'b0}}, count};
+    //assign la_data_out = {{(128-BITS){1'b0}}, count};
     // Assuming LA probes [63:32] are for controlling the count register  
-    assign la_write = ~la_oenb[63:64-BITS] & ~{BITS{valid}};
+    //assign la_write = ~la_oenb[63:64-BITS] & ~{BITS{valid}};
     // Assuming LA probes [65:64] are for controlling the count clk & reset  
-    assign clk = (~la_oenb[64]) ? la_data_in[64]: wb_clk_i;
-    assign rst = (~la_oenb[65]) ? la_data_in[65]: wb_rst_i;
+    assign clk = wb_clk_i;
+    assign rst = wb_rst_i;
 
-    counter #(
+    WrapPUF #(
         .BITS(BITS)
-    ) counter(
+    ) WrapPUF(
         .clk(clk),
         .reset(rst),
         .ready(wbs_ack_o),
         .valid(valid),
         .rdata(rdata),
         .wdata(wbs_dat_i[BITS-1:0]),
-        .wstrb(wstrb),
-        .la_write(la_write),
-        .la_input(la_data_in[63:64-BITS]),
-        .count(count)
+        .wstrb(wstrb)
     );
 
 endmodule
 
-module counter #(
-    parameter BITS = 16
+module WrapPUF #(
+    parameter BITS = 32
 )(
     input clk,
     input reset,
     input valid,
     input [3:0] wstrb,
     input [BITS-1:0] wdata,
-    input [BITS-1:0] la_write,
-    input [BITS-1:0] la_input,
     output reg ready,
-    output reg [BITS-1:0] rdata,
-    output reg [BITS-1:0] count
+    output reg [BITS-1:0] rdata
 );
+BR_PUF PUF1(
+            .challenge(io_in[37:6]),
+            .reset(rst),
+            .response(io_out[5])
+            );
 
     always @(posedge clk) begin
         if (reset) begin

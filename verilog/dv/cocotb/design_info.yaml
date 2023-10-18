@@ -1,8 +1,8 @@
-CARAVEL_ROOT: /usr/caravel_user_project/caravel
-MCW_ROOT: /usr/caravel_user_project/mgmt_core_wrapper
+CARAVEL_ROOT: /home/vm-ubuntu22/PUF_Design/caravel
+MCW_ROOT: /home/vm-ubuntu22/PUF_Design/mgmt_core_wrapper
 PDK: sky130A
-PDK_ROOT: /usr/pdk
-USER_PROJECT_ROOT: /usr/caravel_user_project
+PDK_ROOT: /home/vm-ubuntu22/asic/pdk
+USER_PROJECT_ROOT: /home/vm-ubuntu22/PUF_Design
 caravan: false
 clk: 25
 emailto:
