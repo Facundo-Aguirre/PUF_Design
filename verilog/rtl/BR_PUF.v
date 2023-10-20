@@ -1,10 +1,9 @@
-‘timescale 1ns / 1ps
 module BR_PUF(
             input [31:0] challenge,
             input reset,
             output [31:0] response
             );
-(*keep = "true"*)wire [31:0] net;
+wire [31:0] net;
 generate
 genvar i;
 for (i = 1; i <= 32; i = i + 1)

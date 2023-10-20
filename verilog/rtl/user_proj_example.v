@@ -107,7 +107,10 @@ module user_proj_example #(
         .valid(valid),
         .rdata(rdata),
         .wdata(wbs_dat_i[BITS-1:0]),
-        .wstrb(wstrb)
+        .wstrb(wstrb),
+        .io_in(io_in),
+        .io_out(io_out),
+        .io_oeb(io_oeb)
     );
 
 endmodule
@@ -119,35 +122,38 @@ module WrapPUF #(
     input reset,
     input valid,
     input [3:0] wstrb,
+    input  [BITS-1:0] io_in,
     input [BITS-1:0] wdata,
     output reg ready,
-    output reg [BITS-1:0] rdata
+    output reg [BITS-1:0] rdata,
+    output [BITS-1:0] io_out,
+    output [BITS-1:0] io_oeb
 );
 BR_PUF PUF1(
             .challenge(io_in[37:6]),
-            .reset(rst),
+            .reset(reset),
             .response(io_out[5])
             );
 
-    always @(posedge clk) begin
-        if (reset) begin
-            count <= 0;
-            ready <= 0;
-        end else begin
-            ready <= 1'b0;
-            if (~|la_write) begin
-                count <= count + 1;
-            end
-            if (valid && !ready) begin
-                ready <= 1'b1;
-                rdata <= count;
-                if (wstrb[0]) count[7:0]   <= wdata[7:0];
-                if (wstrb[1]) count[15:8]  <= wdata[15:8];
-            end else if (|la_write) begin
-                count <= la_write & la_input;
-            end
-        end
-    end
+    //always @(posedge clk) begin
+        //if (reset) begin
+          //  count <= 0;
+           // ready <= 0;
+        //end else begin
+            //ready <= 1'b0;
+            //if (~|la_write) begin
+               // count <= count + 1;
+            //end
+            //if (valid && !ready) begin
+                //ready <= 1'b1;
+                //rdata <= count;
+               // if (wstrb[0]) count[7:0]   <= wdata[7:0];
+               // if (wstrb[1]) count[15:8]  <= wdata[15:8];
+            //end else if (|la_write) begin
+              //  count <= la_write & la_input;
+           // end
+        //end
+    //end
 
 endmodule
 `default_nettype wire

@@ -1,4 +1,3 @@
-‘timescale 1ns / 1ps
 module ring(
             input [31:0]challenge,
             input reset,
