@@ -61,9 +61,9 @@ module user_proj_example #(
     input  [127:0] la_oenb,
 
     // IOs
-    input  [BITS-1:0] io_in,
-    output [BITS-1:0] io_out,
-    output [BITS-1:0] io_oeb,
+    input  [37:0] io_in,
+    output [37:0] io_out,
+    output [37:0] io_oeb,
 
     // IRQ
     output [2:0] irq
@@ -82,23 +82,32 @@ module user_proj_example #(
     assign wstrb = wbs_sel_i & {4{wbs_we_i}};
     assign wbs_dat_o = {{(32-BITS){1'b0}}, rdata};
     assign wdata = wbs_dat_i[BITS-1:0];
-
+    assign rdata={(32){1'b0}};
     // IO
     assign io_oeb[37:6] = {(32){1'b1}};
     assign io_oeb[5] = 1'b0;
+    assign io_oeb[4:0]={(5){1'b1}};
 
     // IRQ
     assign irq = 3'b000;	// Unused
 
     // LA
-    //assign la_data_out = {{(128-BITS){1'b0}}, count};
-    // Assuming LA probes [63:32] are for controlling the count register  
-    //assign la_write = ~la_oenb[63:64-BITS] & ~{BITS{valid}};
-    // Assuming LA probes [65:64] are for controlling the count clk & reset  
+    assign la_data_out = {(128){1'b0}};
     assign clk = wb_clk_i;
     assign rst = wb_rst_i;
+    
 
-    WrapPUF #(
+    wire [31:0] rsp;
+   // assign io_out[5]= ^rsp;
+    assign io_out[5]= rsp[5];
+    assign io_out[37:6]={(32){1'b0}};
+    assign io_out[4:0]={(5){1'b0}};
+
+    BR_PUF PUF1(
+            .challenge(io_in[31:0]),
+            .reset(rst),
+            .rsp(rsp));
+    /*WrapPUF #(
         .BITS(BITS)
     ) WrapPUF(
         .clk(clk),
@@ -106,12 +115,11 @@ module user_proj_example #(
         .ready(wbs_ack_o),
         .valid(valid),
         .rdata(rdata),
-        .wdata(wbs_dat_i[BITS-1:0]),
+        .wdata(wbs_dat_i),
         .wstrb(wstrb),
         .io_in(io_in),
-        .io_out(io_out),
-        .io_oeb(io_oeb)
-    );
+        .io_out(io_out));
+    */
 
 endmodule
 
@@ -122,18 +130,24 @@ module WrapPUF #(
     input reset,
     input valid,
     input [3:0] wstrb,
-    input  [BITS-1:0] io_in,
-    input [BITS-1:0] wdata,
+    input [37:0] io_in,
+    input [31:0] wdata,
     output reg ready,
-    output reg [BITS-1:0] rdata,
-    output [BITS-1:0] io_out,
-    output [BITS-1:0] io_oeb
+    output reg [31:0] rdata,
+    output [37:0] io_out
 );
+
+wire [31:0] rsp;
+assign io_out[5]= ^rsp;
+assign rdata={(32){1'b0}};
+assign ready={1'b0};
+assign io_out[37:6]={(32){1'b0}};
+assign io_out[4:0]={(5){1'b0}};
+
 BR_PUF PUF1(
             .challenge(io_in[37:6]),
             .reset(reset),
-            .response(io_out[5])
-            );
+            .rsp(rsp));
 
     //always @(posedge clk) begin
         //if (reset) begin
