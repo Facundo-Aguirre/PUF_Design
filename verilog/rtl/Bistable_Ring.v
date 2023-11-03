@@ -1,4 +1,38 @@
 module ring(
+        input [31:0] challenge,
+        input reset,
+        output rsp);
+    wire [96:0] net;
+    //(*keep = "true"*) wire [96:0] net;
+    //original
+    //assign net[0] = net[96];
+    //updated
+    //assign net[0] = reset ? 1'b0 : net[96];
+    generate
+        genvar i;
+        for (i = 1; i <= 32; i = i + 1)
+        begin : gen_block
+            demux inst_demux_i (
+                .i(net[i * 3 - 3]),
+                .isel(challenge[i - 1]),
+                .outa(net[i * 3 - 2]),
+                .outb(net[i * 3 - 1])
+            );
+            mux inst_mux_i (
+                .ia(~(net[i * 3 - 2]|reset)),
+                .ib(~(net[i * 3 - 1]|reset)),
+                .isel(challenge[i - 1]),
+                .oout(net[i * 3])
+            );
+        end
+    endgenerate
+assign rsp = net[48];
+endmodule
+
+
+/*
+
+module ring(
             input [31:0]challenge,
             input reset,
             output rsp);
@@ -31,7 +65,7 @@ begin
                   
         end
     endgenerate
-   */ 
+
 demux inst_demux(
                         .i(test),
                         .isel(test),
@@ -45,4 +79,13 @@ mux inst_mux(
 //assign response = net[48];
 //assign rsp = 1'b0;
 assign rsp = x[3];
+
+
 endmodule                
+
+*/
+
+
+
+
+

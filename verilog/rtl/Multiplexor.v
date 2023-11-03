@@ -4,7 +4,7 @@ module mux(ia, ib, isel, oout);
     output oout;
 
     //Wires
-    wire oout;
+    //wire oout;
 
     //Multiplexor Logic Verilog
     assign oout = (isel) ? ia : ib; // Select between input a and input b based on the select signal

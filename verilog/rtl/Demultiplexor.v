@@ -4,7 +4,7 @@ module demux(i, isel, outa, outb);
     output outa, outb;
 
     //Wires
-    wire outa, outb;
+    //wire outa, outb;
 
     //Demux logi Verilog
     assign outa = i & isel; // Route input i to output a if select signal is high

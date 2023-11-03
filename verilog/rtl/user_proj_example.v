@@ -68,6 +68,7 @@ module user_proj_example #(
     // IRQ
     output [2:0] irq
 );
+    
     wire clk;
     wire rst;
 
@@ -97,7 +98,9 @@ module user_proj_example #(
     assign rst = wb_rst_i;
     
 
-    wire [31:0] rsp;
+    //wire [31:0] rsp;
+    reg [31:0] rsp;
+    
    // assign io_out[5]= ^rsp;
     assign io_out[5]= rsp[5];
     assign io_out[37:6]={(32){1'b0}};
@@ -120,15 +123,14 @@ module user_proj_example #(
         .io_in(io_in),
         .io_out(io_out));
     */
-
 endmodule
 
 module WrapPUF #(
     parameter BITS = 32
 )(
-    input clk,
+    //input clk,
     input reset,
-    input valid,
+    //input valid,
     input [3:0] wstrb,
     input [37:0] io_in,
     input [31:0] wdata,
