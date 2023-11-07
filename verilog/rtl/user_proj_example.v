@@ -79,6 +79,8 @@ module user_proj_example #(
     wire [3:0] wstrb;
 
     // WB MI A
+    assign wbs_ack_o = 1'b0;
+
     assign valid = wbs_cyc_i && wbs_stb_i; 
     assign wstrb = wbs_sel_i & {4{wbs_we_i}};
     assign wbs_dat_o = {{(32-BITS){1'b0}}, rdata};

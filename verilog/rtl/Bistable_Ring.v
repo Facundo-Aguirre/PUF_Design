@@ -2,12 +2,12 @@ module ring(
         input [31:0] challenge,
         input reset,
         output rsp);
-    wire [96:0] net;
-    //(*keep = "true"*) wire [96:0] net;
+    //wire [96:0] net;
+    (*keep = "true"*) wire [96:0] net;
     //original
     //assign net[0] = net[96];
     //updated
-    //assign net[0] = reset ? 1'b0 : net[96];
+    assign net[0] = reset ? 1'b0 : net[96];
     generate
         genvar i;
         for (i = 1; i <= 32; i = i + 1)
